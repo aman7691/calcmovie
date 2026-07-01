@@ -1,0 +1,63 @@
+name: secret_vault_app
+description: A secret calculator app that unlocks a hidden Movie & TV Series browser.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management - Riverpod chosen for its compile-safe, testable, and scalable approach
+  # vs Bloc (more boilerplate) vs Provider (less powerful for complex state)
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # HTTP Client - Dio chosen for interceptors, timeout config, error handling over plain http
+  dio: ^5.7.0
+
+  # Local Storage - Hive chosen for fast NoSQL key-value storage, great for favorites
+  # vs SQLite (overkill for simple favorites) vs SharedPreferences (no typed objects)
+  hive_flutter: ^1.1.0
+
+  # Image caching
+  cached_network_image: ^3.4.1
+
+  # URL Launcher for YouTube trailer playback
+  url_launcher: ^6.3.1
+
+  # Navigation
+  go_router: ^14.6.3
+
+  # Icons
+  cupertino_icons: ^1.0.8
+
+  # Connectivity check
+  connectivity_plus: ^6.1.4
+
+  # Shimmer loading effect
+  shimmer: ^3.0.0
+
+  # Icons pack
+  font_awesome_flutter: ^10.8.0
+
+  # In-app WebView for vidsrc streaming player
+  webview_flutter: ^4.10.0
+  webview_flutter_android: ^4.10.0
+  webview_flutter_wkwebview: ^3.23.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.13
+  riverpod_generator: ^2.6.2
+  mockito: ^5.4.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
