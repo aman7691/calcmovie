@@ -12,7 +12,7 @@ class Env {
   Env._();
 
   /// TMDB API key - replace with your own from https://www.themoviedb.org/settings/api
-  static const String tmdbApiKey = '110ca354640ec0a1c6cdefe92391ab97';
+  static const String tmdbApiKey = '';
 
   /// TMDB API base URL
   static const String tmdbBaseUrl = 'https://api.themoviedb.org/3';
