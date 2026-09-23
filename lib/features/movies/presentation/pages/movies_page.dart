@@ -65,7 +65,8 @@ class _MoviesPageState extends ConsumerState<MoviesPage>
       final oldController = _tabController;
       _tabController = TabController(length: newLength, vsync: this);
       // Defer disposal so the old controller is not used after disposal
-      WidgetsBinding.instance.addPostFrameCallback((_) => oldController.dispose());
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => oldController.dispose());
     }
   }
 
@@ -98,7 +99,8 @@ class _MoviesPageState extends ConsumerState<MoviesPage>
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         backgroundColor: AppTheme.surface,
-        title: const Text('Movies', style: TextStyle(color: AppTheme.onBackground)),
+        title: const Text('Movies',
+            style: TextStyle(color: AppTheme.onBackground)),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -182,7 +184,8 @@ class _MovieListTabState extends ConsumerState<_MovieListTab>
     final state = ref.watch(_provider);
 
     if (state.movies.isEmpty && state.isLoading) {
-      return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
+      return const Center(
+          child: CircularProgressIndicator(color: AppTheme.primary));
     }
 
     if (state.movies.isEmpty && state.error != null) {
@@ -205,7 +208,7 @@ class _MovieListTabState extends ConsumerState<_MovieListTab>
           mainAxisSpacing: 10,
         ),
         itemCount: state.movies.length + (state.isLoading ? 2 : 0),
-          itemBuilder: (context, i) {
+        itemBuilder: (context, i) {
           if (i >= state.movies.length) {
             return const _ShimmerCard();
           }
@@ -228,7 +231,7 @@ class _MovieCard extends ConsumerWidget {
         .select((list) => list.any((f) => f.id == movie.id && f.isMovie)));
 
     return GestureDetector(
-      onTap: () => context.push(AppRoutes.movieDetail(movie.id)),
+      onTap: () => context.push(AppRoutes.movieDetail(movie.id), extra: movie),
       child: Card(
         color: AppTheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -296,7 +299,8 @@ class _MovieCard extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    if (movie.overview != null && movie.overview!.isNotEmpty) ...[
+                    if (movie.overview != null &&
+                        movie.overview!.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         movie.overview!,

@@ -8,6 +8,7 @@ import 'package:secret_vault_app/features/tv_series/presentation/pages/tv_series
 import 'package:secret_vault_app/features/search/presentation/pages/search_page.dart';
 import 'package:secret_vault_app/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:secret_vault_app/features/movies/presentation/pages/movie_list_page.dart';
+import 'package:secret_vault_app/features/movies/domain/entities/movie.dart';
 import 'package:secret_vault_app/features/tv_series/presentation/pages/tv_list_page.dart';
 import 'package:secret_vault_app/features/video/presentation/pages/vidsrc_player_page.dart';
 import 'package:secret_vault_app/shared/widgets/main_shell.dart';
@@ -74,12 +75,10 @@ final appRouter = GoRouter(
         final title = state.uri.queryParameters['title'] ?? '';
         final isMovie =
             (state.uri.queryParameters['isMovie'] ?? 'true') == 'true';
-        final season = int.tryParse(
-                state.uri.queryParameters['season'] ?? '1') ??
-            1;
-        final episode = int.tryParse(
-                state.uri.queryParameters['episode'] ?? '1') ??
-            1;
+        final season =
+            int.tryParse(state.uri.queryParameters['season'] ?? '1') ?? 1;
+        final episode =
+            int.tryParse(state.uri.queryParameters['episode'] ?? '1') ?? 1;
         return VidsrcPlayerPage(
           tmdbId: tmdbId,
           title: title,
@@ -104,23 +103,25 @@ final appRouter = GoRouter(
               name: 'movieDetail',
               builder: (context, state) {
                 final id = int.parse(state.pathParameters['id']!);
-                return MovieDetailPage(movieId: id);
+                return MovieDetailPage(
+                  movieId: id,
+                  initialMovie:
+                      state.extra is Movie ? state.extra as Movie : null,
+                );
               },
             ),
             GoRoute(
               path: 'list',
               name: 'movieList',
               builder: (context, state) {
-                final title =
-                    state.uri.queryParameters['title'] ?? 'Movies';
+                final title = state.uri.queryParameters['title'] ?? 'Movies';
                 final category =
                     state.uri.queryParameters['category'] ?? 'popular';
                 final genreId = state.uri.queryParameters['genreId'];
                 return MovieListPage(
                   title: title,
                   category: category,
-                  genreId:
-                      genreId != null ? int.tryParse(genreId) : null,
+                  genreId: genreId != null ? int.tryParse(genreId) : null,
                 );
               },
             ),
@@ -143,16 +144,14 @@ final appRouter = GoRouter(
               path: 'list',
               name: 'tvList',
               builder: (context, state) {
-                final title =
-                    state.uri.queryParameters['title'] ?? 'TV Series';
+                final title = state.uri.queryParameters['title'] ?? 'TV Series';
                 final category =
                     state.uri.queryParameters['category'] ?? 'popular';
                 final genreId = state.uri.queryParameters['genreId'];
                 return TvListPage(
                   title: title,
                   category: category,
-                  genreId:
-                      genreId != null ? int.tryParse(genreId) : null,
+                  genreId: genreId != null ? int.tryParse(genreId) : null,
                 );
               },
             ),

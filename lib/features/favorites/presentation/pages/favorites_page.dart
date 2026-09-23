@@ -7,8 +7,8 @@ import 'package:secret_vault_app/features/favorites/data/models/favorite_item_mo
 import 'package:secret_vault_app/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:secret_vault_app/features/history/data/models/watch_history_model.dart';
 import 'package:secret_vault_app/features/history/presentation/providers/watch_history_provider.dart';
-import 'package:secret_vault_app/shared/widgets/error_view.dart'
-    show EmptyView;
+import 'package:secret_vault_app/features/movies/domain/entities/movie.dart';
+import 'package:secret_vault_app/shared/widgets/error_view.dart' show EmptyView;
 import 'package:secret_vault_app/shared/widgets/poster_image.dart';
 import 'package:secret_vault_app/shared/widgets/rating_badge.dart';
 
@@ -54,8 +54,7 @@ class FavoritesPage extends ConsumerWidget {
                           ref.read(watchHistoryProvider.notifier).clearAll(),
                       child: const Text('Clear',
                           style: TextStyle(
-                              color: AppTheme.onSurfaceVariant,
-                              fontSize: 12)),
+                              color: AppTheme.onSurfaceVariant, fontSize: 12)),
                     ),
                   ),
                   SizedBox(
@@ -64,8 +63,7 @@ class FavoritesPage extends ConsumerWidget {
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       itemCount: history.length,
-                      separatorBuilder: (_, __) =>
-                          const SizedBox(width: 10),
+                      separatorBuilder: (_, __) => const SizedBox(width: 10),
                       itemBuilder: (context, i) =>
                           _HistoryCard(item: history[i]),
                     ),
@@ -107,8 +105,7 @@ class FavoritesPage extends ConsumerWidget {
               ref.read(favoritesProvider.notifier).clearAll();
               Navigator.pop(ctx);
             },
-            child: const Text('Clear',
-                style: TextStyle(color: Colors.red)),
+            child: const Text('Clear', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -157,7 +154,15 @@ class _HistoryCard extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         if (item.isMovie) {
-          context.push(AppRoutes.movieDetail(item.id));
+          context.push(
+            AppRoutes.movieDetail(item.id),
+            extra: Movie(
+              id: item.id,
+              title: item.title,
+              posterPath: item.posterPath,
+              voteAverage: item.voteAverage,
+            ),
+          );
         } else {
           context.push(AppRoutes.tvDetail(item.id));
         }
@@ -195,8 +200,8 @@ class _HistoryCard extends ConsumerWidget {
                   top: 6,
                   left: 6,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 5, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                     decoration: BoxDecoration(
                       color: item.isMovie
                           ? AppTheme.primary.withValues(alpha: 0.85)
@@ -248,11 +253,21 @@ class _FavoriteItemTile extends ConsumerWidget {
     final favNotifier = ref.read(favoritesProvider.notifier);
 
     return ListTile(
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       onTap: () {
         if (item.isMovie) {
-          context.push(AppRoutes.movieDetail(item.id));
+          context.push(
+            AppRoutes.movieDetail(item.id),
+            extra: Movie(
+              id: item.id,
+              title: item.title,
+              posterPath: item.posterPath,
+              backdropPath: item.backdropPath,
+              voteAverage: item.voteAverage,
+              releaseDate: item.releaseDate,
+              overview: item.overview,
+            ),
+          );
         } else {
           context.push(AppRoutes.tvDetail(item.id));
         }
@@ -275,8 +290,7 @@ class _FavoriteItemTile extends ConsumerWidget {
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: item.isMovie
                       ? AppTheme.primary.withValues(alpha: 0.2)

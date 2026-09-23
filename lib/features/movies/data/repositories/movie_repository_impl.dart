@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:secret_vault_app/core/errors/exceptions.dart' as app_exceptions;
 import 'package:secret_vault_app/core/errors/failures.dart';
+import 'package:secret_vault_app/core/network/dio_client.dart';
 import 'package:secret_vault_app/features/movies/data/datasources/movie_remote_datasource.dart';
 import 'package:secret_vault_app/features/movies/domain/entities/movie.dart';
 import 'package:secret_vault_app/features/movies/domain/repositories/movie_repository.dart';
@@ -40,7 +42,8 @@ class MovieRepositoryImpl implements MovieRepository {
 
   @override
   Future<List<Movie>> getMoviesByCountry(String countryCode, {int page = 1}) =>
-      _execute(() => _remoteDataSource.getMoviesByCountry(countryCode, page: page));
+      _execute(
+          () => _remoteDataSource.getMoviesByCountry(countryCode, page: page));
 
   @override
   Future<Movie> getMovieDetail(int movieId) =>
@@ -52,7 +55,8 @@ class MovieRepositoryImpl implements MovieRepository {
 
   @override
   Future<List<Movie>> getMovieRecommendations(int movieId, {int page = 1}) =>
-      _execute(() => _remoteDataSource.getMovieRecommendations(movieId, page: page));
+      _execute(
+          () => _remoteDataSource.getMovieRecommendations(movieId, page: page));
 
   @override
   Future<List<Genre>> getMovieGenres() =>
@@ -66,6 +70,8 @@ class MovieRepositoryImpl implements MovieRepository {
   Future<T> _execute<T>(Future<T> Function() call) async {
     try {
       return await call();
+    } on DioException catch (e) {
+      throw _toFailure(DioClient.toAppException(e));
     } on app_exceptions.NetworkException catch (e) {
       throw NetworkFailure(e.message);
     } on app_exceptions.TimeoutException catch (e) {
@@ -77,5 +83,24 @@ class MovieRepositoryImpl implements MovieRepository {
     } catch (e) {
       throw UnexpectedFailure(e.toString());
     }
+  }
+
+  Failure _toFailure(app_exceptions.AppException exception) {
+    if (exception is app_exceptions.NetworkException) {
+      return NetworkFailure(exception.message);
+    }
+    if (exception is app_exceptions.TimeoutException) {
+      return TimeoutFailure(exception.message);
+    }
+    if (exception is app_exceptions.UnauthorizedException) {
+      return UnauthorizedFailure(exception.message);
+    }
+    if (exception is app_exceptions.ServerException) {
+      return ServerFailure(
+        message: exception.message,
+        statusCode: exception.statusCode,
+      );
+    }
+    return UnexpectedFailure(exception.message);
   }
 }

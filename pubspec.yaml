@@ -12,8 +12,8 @@ dependencies:
 
   # State Management - Riverpod chosen for its compile-safe, testable, and scalable approach
   # vs Bloc (more boilerplate) vs Provider (less powerful for complex state)
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
+  flutter_riverpod: ^2.4.0
+  riverpod_annotation: ^2.4.0
 
   # HTTP Client - Dio chosen for interceptors, timeout config, error handling over plain http
   dio: ^5.7.0
@@ -54,7 +54,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   hive_generator: ^2.0.1
   build_runner: ^2.4.13
-  riverpod_generator: ^2.6.2
+  riverpod_generator: ^2.4.0
   mockito: ^5.4.4
 
 flutter:

@@ -15,7 +15,13 @@ import 'package:secret_vault_app/shared/widgets/rating_badge.dart';
 
 class MovieDetailPage extends ConsumerWidget {
   final int movieId;
-  const MovieDetailPage({super.key, required this.movieId});
+  final Movie? initialMovie;
+
+  const MovieDetailPage({
+    super.key,
+    required this.movieId,
+    this.initialMovie,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,11 +35,23 @@ class MovieDetailPage extends ConsumerWidget {
         body: const Center(
             child: CircularProgressIndicator(color: AppTheme.primary)),
       ),
-      error: (e, _) => Scaffold(
-        backgroundColor: AppTheme.background,
-        appBar: AppBar(backgroundColor: AppTheme.surface),
-        body: ErrorView(message: e.toString()),
-      ),
+      error: (e, _) {
+        if (initialMovie != null) {
+          return _MovieDetailContent(
+            movie: initialMovie!,
+            videosAsync: videosAsync,
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: AppTheme.background,
+          appBar: AppBar(backgroundColor: AppTheme.surface),
+          body: ErrorView(
+            message: e.toString(),
+            onRetry: () => ref.invalidate(movieDetailProvider(movieId)),
+          ),
+        );
+      },
       data: (movie) => _MovieDetailContent(
         movie: movie,
         videosAsync: videosAsync,
@@ -129,7 +147,8 @@ class _MovieDetailContent extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            RatingBadge(rating: movie.voteAverage, fontSize: 14),
+                            RatingBadge(
+                                rating: movie.voteAverage, fontSize: 14),
                             const SizedBox(height: 6),
                             _MetaRow(
                                 icon: Icons.calendar_today_outlined,
@@ -161,8 +180,7 @@ class _MovieDetailContent extends ConsumerWidget {
                                 backgroundColor: AppTheme.surface,
                                 labelStyle: const TextStyle(
                                     color: AppTheme.onBackground),
-                                side:
-                                    const BorderSide(color: AppTheme.primary),
+                                side: const BorderSide(color: AppTheme.primary),
                                 padding: EdgeInsets.zero,
                               ))
                           .toList(),
@@ -284,8 +302,8 @@ class _RecommendedSection extends ConsumerWidget {
     return recsAsync.when(
       loading: () => const SizedBox(
         height: 180,
-        child: Center(
-            child: CircularProgressIndicator(color: AppTheme.primary)),
+        child:
+            Center(child: CircularProgressIndicator(color: AppTheme.primary)),
       ),
       error: (_, __) => const SizedBox.shrink(),
       data: (movies) {
@@ -308,8 +326,7 @@ class _RecommendedSection extends ConsumerWidget {
                 scrollDirection: Axis.horizontal,
                 itemCount: movies.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (context, i) =>
-                    _RecommendedCard(movie: movies[i]),
+                itemBuilder: (context, i) => _RecommendedCard(movie: movies[i]),
               ),
             ),
           ],
@@ -326,7 +343,7 @@ class _RecommendedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(AppRoutes.movieDetail(movie.id)),
+      onTap: () => context.push(AppRoutes.movieDetail(movie.id), extra: movie),
       child: SizedBox(
         width: 110,
         child: Column(

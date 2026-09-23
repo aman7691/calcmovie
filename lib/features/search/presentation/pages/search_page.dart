@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:secret_vault_app/core/routing/app_router.dart';
 import 'package:secret_vault_app/core/theme/app_theme.dart';
+import 'package:secret_vault_app/features/movies/domain/entities/movie.dart';
 import 'package:secret_vault_app/features/search/presentation/providers/search_provider.dart';
 import 'package:secret_vault_app/shared/widgets/error_view.dart'
     show ErrorView, EmptyView;
@@ -86,8 +87,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     if (state.error != null) {
       return ErrorView(
         message: state.error!,
-        onRetry: () =>
-            ref.read(searchProvider.notifier).search(state.query),
+        onRetry: () => ref.read(searchProvider.notifier).search(state.query),
       );
     }
 
@@ -113,11 +113,19 @@ class _SearchResultTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       onTap: () {
         if (result.isMovie) {
-          context.push(AppRoutes.movieDetail(result.id));
+          context.push(
+            AppRoutes.movieDetail(result.id),
+            extra: Movie(
+              id: result.id,
+              title: result.title,
+              posterPath: result.posterPath,
+              voteAverage: result.voteAverage,
+              releaseDate: result.releaseYear,
+            ),
+          );
         } else {
           context.push(AppRoutes.tvDetail(result.id));
         }
@@ -140,8 +148,7 @@ class _SearchResultTile extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: result.isMovie
                       ? AppTheme.primary.withValues(alpha: 0.2)
@@ -168,7 +175,8 @@ class _SearchResultTile extends StatelessWidget {
           RatingBadge(rating: result.voteAverage, fontSize: 12),
         ],
       ),
-      trailing: const Icon(Icons.chevron_right, color: AppTheme.onSurfaceVariant),
+      trailing:
+          const Icon(Icons.chevron_right, color: AppTheme.onSurfaceVariant),
     );
   }
 }

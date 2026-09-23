@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:secret_vault_app/core/errors/exceptions.dart' as app_exceptions;
 import 'package:secret_vault_app/core/errors/failures.dart';
+import 'package:secret_vault_app/core/network/dio_client.dart';
 import 'package:secret_vault_app/features/tv_series/data/datasources/tv_remote_datasource.dart';
 import 'package:secret_vault_app/features/tv_series/domain/entities/episode.dart';
 import 'package:secret_vault_app/features/tv_series/domain/entities/tv_series.dart';
@@ -56,11 +58,14 @@ class TvRepositoryImpl implements TvRepository {
 
   @override
   Future<List<Episode>> getSeasonEpisodes(int seriesId, int seasonNumber) =>
-      _execute(() => _remoteDataSource.getSeasonEpisodes(seriesId, seasonNumber));
+      _execute(
+          () => _remoteDataSource.getSeasonEpisodes(seriesId, seasonNumber));
 
   Future<T> _execute<T>(Future<T> Function() call) async {
     try {
       return await call();
+    } on DioException catch (e) {
+      throw _toFailure(DioClient.toAppException(e));
     } on app_exceptions.NetworkException catch (e) {
       throw NetworkFailure(e.message);
     } on app_exceptions.TimeoutException catch (e) {
@@ -72,5 +77,24 @@ class TvRepositoryImpl implements TvRepository {
     } catch (e) {
       throw UnexpectedFailure(e.toString());
     }
+  }
+
+  Failure _toFailure(app_exceptions.AppException exception) {
+    if (exception is app_exceptions.NetworkException) {
+      return NetworkFailure(exception.message);
+    }
+    if (exception is app_exceptions.TimeoutException) {
+      return TimeoutFailure(exception.message);
+    }
+    if (exception is app_exceptions.UnauthorizedException) {
+      return UnauthorizedFailure(exception.message);
+    }
+    if (exception is app_exceptions.ServerException) {
+      return ServerFailure(
+        message: exception.message,
+        statusCode: exception.statusCode,
+      );
+    }
+    return UnexpectedFailure(exception.message);
   }
 }

@@ -83,8 +83,7 @@ class _MovieListPageState extends ConsumerState<MovieListPage> {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                     ),
-                    itemCount:
-                        state.movies.length + (state.isLoading ? 2 : 0),
+                    itemCount: state.movies.length + (state.isLoading ? 2 : 0),
                     itemBuilder: (context, i) {
                       if (i >= state.movies.length) {
                         return _LoadingCard();
@@ -108,7 +107,7 @@ class _MovieCard extends ConsumerWidget {
         .select((list) => list.any((f) => f.id == movie.id && f.isMovie)));
 
     return GestureDetector(
-      onTap: () => context.push(AppRoutes.movieDetail(movie.id)),
+      onTap: () => context.push(AppRoutes.movieDetail(movie.id), extra: movie),
       child: Card(
         color: AppTheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -161,7 +160,8 @@ class _MovieCard extends ConsumerWidget {
                         const Spacer(),
                         Text(movie.releaseYear,
                             style: const TextStyle(
-                                color: AppTheme.onSurfaceVariant, fontSize: 11)),
+                                color: AppTheme.onSurfaceVariant,
+                                fontSize: 11)),
                       ],
                     ),
                   ],

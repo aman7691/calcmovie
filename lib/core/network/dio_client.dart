@@ -1,10 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:secret_vault_app/core/constants/app_constants.dart';
-import 'package:secret_vault_app/core/errors/exceptions.dart'
-    as app_exceptions;
+import 'package:secret_vault_app/core/errors/exceptions.dart' as app_exceptions;
 
 /// Dio HTTP client configured for TMDB API calls.
-/// Uses interceptors for: logging, error handling, and API key injection.
+/// Uses base options for API key injection and shared request settings.
 class DioClient {
   static Dio? _dio;
 
@@ -31,45 +30,38 @@ class DioClient {
       ),
     );
 
-    // Add interceptors
-    dio.interceptors.addAll([
-      _ErrorInterceptor(),
-      // Uncomment below for debug logging:
-      // LogInterceptor(requestBody: true, responseBody: true),
-    ]);
+    // Uncomment below for debug logging:
+    // dio.interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
 
     return dio;
   }
-}
 
-/// Converts Dio errors into typed AppExceptions
-class _ErrorInterceptor extends Interceptor {
-  @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    switch (err.type) {
+  /// Converts Dio errors into typed app exceptions.
+  static app_exceptions.AppException toAppException(DioException exception) {
+    switch (exception.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        throw app_exceptions.TimeoutException();
+        return const app_exceptions.TimeoutException();
       case DioExceptionType.connectionError:
-        throw app_exceptions.NetworkException();
+        return const app_exceptions.NetworkException();
       case DioExceptionType.badResponse:
-        final statusCode = err.response?.statusCode;
+        final statusCode = exception.response?.statusCode;
         if (statusCode == 401) {
-          throw app_exceptions.UnauthorizedException();
-        } else if (statusCode == 404) {
-          throw app_exceptions.ServerException(
+          return const app_exceptions.UnauthorizedException();
+        }
+        if (statusCode == 404) {
+          return app_exceptions.ServerException(
             message: 'Content not found.',
             statusCode: statusCode,
           );
-        } else {
-          throw app_exceptions.ServerException(
-            message: 'Server error ($statusCode).',
-            statusCode: statusCode,
-          );
         }
+        return app_exceptions.ServerException(
+          message: 'Server error ($statusCode).',
+          statusCode: statusCode,
+        );
       default:
-        throw app_exceptions.NetworkException('Network error occurred.');
+        return const app_exceptions.NetworkException('Network error occurred.');
     }
   }
 }

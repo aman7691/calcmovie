@@ -25,9 +25,6 @@ Future<void> main() async {
     statusBarBrightness: Brightness.dark,
   ));
 
-  // Lock to portrait for the main app (player page unlocks landscape separately).
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
   // Initialize Hive for local favorites storage
   await Hive.initFlutter();
 
